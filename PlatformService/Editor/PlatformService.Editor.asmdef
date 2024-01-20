@@ -1,13 +1,13 @@
 {
-    "name": "SnBridge",
+    "name": "PlatformService.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:e309f58f5659d0c44af5111820aac19c",
-        "GUID:7e80685e26614c03a348ff0734bf8576",
-        "GUID:17d73ebbc8a146c4a75e9a271173df8b"
+        "GUID:8c1b5e158961445498f8a66188fbb2e3",
+        "GUID:69448af7b92c7f342b298e06a37122aa"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
