@@ -7,10 +7,10 @@ namespace Modules.UIService
 {
     public abstract class UIView : MonoBehaviour, IViewControl
     {
-        [SerializeReference, SubclassSelector] 
+        [SerializeReference] 
         private IViewAnimation _showAnimation;
         
-        [SerializeReference, SubclassSelector] 
+        [SerializeReference] 
         private IViewAnimation _hideAnimation;
 
         protected UIModel BaseModel;

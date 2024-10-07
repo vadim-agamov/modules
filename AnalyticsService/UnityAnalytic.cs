@@ -17,6 +17,6 @@ namespace Modules.AnalyticsService
 
         void IAnalytic.Stop() => Instance.StopDataCollection();
 
-        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters) => Instance.CustomData(eventName, parameters);
+        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters) => Instance.RecordEvent(eventName);
     }
 }

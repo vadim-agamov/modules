@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using Modules.Events;
 using Modules.PlatformService;
 using Modules.PlayerDataService;
@@ -11,6 +9,10 @@ using Modules.ServiceLocator;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Pool;
+
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+
 
 namespace Modules.SoundService
 {
@@ -113,10 +115,10 @@ namespace Modules.SoundService
             {
                 if (audioSource.clip.name == soundId)
                 {
-                    await audioSource.DOFade(0, 0.2f)
-                        .ToUniTask(cancellationToken: _cancellationToken.Token)
-                        .SuppressCancellationThrow();
-                    audioSource.Stop();
+                    // await audioSource.DOFade(0, 0.2f)
+                    //     .ToUniTask(cancellationToken: _cancellationToken.Token)
+                    //     .SuppressCancellationThrow();
+                    // audioSource.Stop();
                     _objectPool.Release(audioSource);
                     break;
                 }
