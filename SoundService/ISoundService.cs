@@ -3,7 +3,7 @@ using Modules.ServiceLocator;
 
 namespace Modules.SoundService
 {
-    public interface ISoundService: IService
+    public interface ISoundService: IInitializableService
     {
         void PlayLoop(string soundId);
         UniTask Play(string soundId);

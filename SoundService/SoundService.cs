@@ -36,8 +36,9 @@ namespace Modules.SoundService
             IsMuted = isMuted;
             return this;
         }
+        
 
-        async UniTask IService.Initialize(CancellationToken cancellationToken)
+        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(SoundService)}]";

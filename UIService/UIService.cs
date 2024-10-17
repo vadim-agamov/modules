@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
@@ -19,8 +20,8 @@ namespace Modules.UIService
         {
             ReferenceResolution = referenceResolution;
         }
-
-        UniTask IService.Initialize(CancellationToken _)
+        
+        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             SetupCanvas();
             return UniTask.CompletedTask;

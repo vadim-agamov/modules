@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.PlatformService;
 using Modules.ServiceLocator;
 
 namespace Modules.AnalyticsService
@@ -8,6 +9,9 @@ namespace Modules.AnalyticsService
     public class AnalyticsService: IAnalyticsService
     {
         private readonly List<IAnalytic> _analytics = new List<IAnalytic>();
+        
+        [InitializationDependency]
+        private IPlatformService PlatformService { get; set; }
         
         private readonly Dictionary<string, object> _parameters = new Dictionary<string, object>()
         {
@@ -23,7 +27,8 @@ namespace Modules.AnalyticsService
             {"sn", "dummy"}
 #endif
         };
-        
+
+
         public AnalyticsService()
         {
 #if !UNITY_EDITOR
@@ -31,11 +36,7 @@ namespace Modules.AnalyticsService
             _analytics.Add(new PlatformAnalytic());
 #endif
         }
-
-        async UniTask IService.Initialize(CancellationToken cancellationToken)
-        {
-            await UniTask.WhenAll(_analytics.Select(a => a.Initialize(cancellationToken)));
-        }
+        
         
         void IService.Dispose()
         {
@@ -54,5 +55,11 @@ namespace Modules.AnalyticsService
             
             _analytics.ForEach(a => a.TrackEvent(eventName, parameters));
         }
+
+        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        {
+            await UniTask.WhenAll(_analytics.Select(a => a.Initialize(cancellationToken)));
+        }
+
     }
 }

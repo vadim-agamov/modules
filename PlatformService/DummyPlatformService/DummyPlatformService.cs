@@ -9,7 +9,7 @@ namespace Modules.PlatformService.DummyPlatformService
 {
     public class DummyPlatformService : MonoBehaviour, IPlatformService
     {
-        UniTask IService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             return UniTask.CompletedTask;

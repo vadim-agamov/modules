@@ -2,7 +2,7 @@ using Modules.ServiceLocator;
 
 namespace Modules.CheatService
 {
-    public interface ICheatService : IService
+    public interface ICheatService : IInitializableService
     {
         void Show();
         void Hide();

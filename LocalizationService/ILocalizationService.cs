@@ -13,7 +13,7 @@ using Modules.ServiceLocator;
 
 namespace Modules.LocalizationService
 {
-    public interface ILocalizationService: IService
+    public interface ILocalizationService: IInitializableService
     {
         void SetLanguage(Language language);
         void Register(LocalizationProviderConfig providerConfig);

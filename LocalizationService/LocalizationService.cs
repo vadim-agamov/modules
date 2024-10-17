@@ -17,9 +17,11 @@ namespace Modules.LocalizationService
         private HashSet<LocalizationProviderConfig> _providers = new ();
         private Dictionary<string, string> _keys = new ();
         private Language _language;
+        
+        [InitializationDependency]
         private IPlatformService PlatformService { get; set; }
         
-        UniTask IService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             PlatformService = ServiceLocator.ServiceLocator.Get<IPlatformService>();
             _language = PlatformService.GetLocale();

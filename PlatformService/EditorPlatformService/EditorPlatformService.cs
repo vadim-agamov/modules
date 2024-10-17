@@ -75,14 +75,15 @@ namespace Modules.PlatformService.EditorPlatformService
 		{
 		}
 
-		async UniTask IService.Initialize(CancellationToken cancellationToken)
+		
+		void IService.Dispose()
+		{
+		}
+		
+		async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
 		{
 			DontDestroyOnLoad(gameObject);
 			await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellationToken);
-		}
-
-		void IService.Dispose()
-		{
 		}
 	}
 }

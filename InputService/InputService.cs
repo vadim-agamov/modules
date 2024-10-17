@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -15,12 +14,14 @@ namespace Modules.InputService
         private IInputService This => this;
         private int TouchCount => Input.touchCount > 0 ? Input.touchCount : Input.GetMouseButton(0) ? 1 : 0;
         private PointerEventData _eventDataCurrentPosition;
+        private bool _isReady;
         
-        UniTask IService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             _raycastResult = new List<RaycastResult>();
             return UniTask.CompletedTask;
         }
+
         
         void IService.Dispose()
         {

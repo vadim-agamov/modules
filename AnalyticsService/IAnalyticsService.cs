@@ -13,7 +13,7 @@ namespace Modules.AnalyticsService
         void TrackEvent(string eventName, Dictionary<string, object> parameters);
     }
 
-    public interface IAnalyticsService: IService
+    public interface IAnalyticsService: IInitializableService
     {
         void Start();
         void Stop();

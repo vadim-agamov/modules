@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.PlatformService;
@@ -8,19 +9,20 @@ using UnityEngine;
 
 namespace Modules.PlayerDataService
 {
-    public abstract class PlayerDataService<TData> : MonoBehaviour, IService where TData : new()
+    public abstract class PlayerDataService<TData> : MonoBehaviour, IInitializableService
+        where TData : new()
     {
-        private IPlatformService PlatformService { get; set; }
+        [InitializationDependency]
+        protected IPlatformService PlatformService { get; set; } // protected since reflection can't see private fields
         
         protected TData Data;
         private bool _needSave;
         private bool _savingIsInProgress;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-
-        async UniTask IService.Initialize(CancellationToken cancellationToken)
+        
+        
+        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
-            PlatformService = ServiceLocator.ServiceLocator.Get<IPlatformService>();
-            
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(PlayerDataService)}]";
 
@@ -43,6 +45,7 @@ namespace Modules.PlayerDataService
 
                 Data ??= new TData();
             }
+            
         }
 
         void IService.Dispose()

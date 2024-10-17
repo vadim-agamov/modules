@@ -5,7 +5,7 @@ using Modules.ServiceLocator;
 
 namespace Modules.PlatformService
 {
-	public interface IPlatformService : IService
+	public interface IPlatformService : IInitializableService
 	{
 		Language GetLocale();
 		string GetUserId();

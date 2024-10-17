@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Modules.InputService
 {
-    public interface IInputService: IService
+    public interface IInputService: IInitializableService
     {
         Vector2 Touch0 { get; }
         Vector2 Touch1 { get; }

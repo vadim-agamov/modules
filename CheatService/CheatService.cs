@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
 using Modules.UIService;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Modules.CheatService
@@ -14,15 +13,17 @@ namespace Modules.CheatService
     {
         private bool _isShown;
         private readonly HashSet<ICheatsProvider> _cheatsProviders = new HashSet<ICheatsProvider>();
+        private bool _isReady;
 
         private ICheatService This => this;
         
-        UniTask IService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(CheatService)}]";
-            return UniTask.CompletedTask;
+            return UniTask.CompletedTask;        
         }
+
         
         void IService.Dispose()
         {

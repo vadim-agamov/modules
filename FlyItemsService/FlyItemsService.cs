@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -14,7 +15,7 @@ using Random = UnityEngine.Random;
 
 namespace Modules.FlyItemsService
 {
-    public interface IFlyItemsService : IService
+    public interface IFlyItemsService : IInitializableService
     {
         UniTask Fly(string name, string from, string to, int count);
         UniTask Fly(string name, Vector3 from, string to, int count);
@@ -23,13 +24,23 @@ namespace Modules.FlyItemsService
         void UnregisterAnchor(FlyItemAnchor anchor);
     }
     
-    public class FlyItemsService: IFlyItemsService 
+    public class FlyItemsService: IFlyItemsService
     {
         private ObjectPool<Image> _pool;
         private Canvas _canvas;
         private FlyItemsConfig _config;
         private readonly List<FlyItemAnchor> _anchors = new();
-        
+
+        [InitializationDependency] 
+        private IUIService UiService { get; set; }
+
+        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        {
+            _canvas = UiService.Canvas;
+            _pool = new ObjectPool<Image>(OnCreateItem, OnGetItem, OnReleaseItem);
+            _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
+        }
+
         private void OnReleaseItem(Image item)
         {
             item.transform.position = Vector3.zero;
@@ -75,13 +86,6 @@ namespace Modules.FlyItemsService
             return Fly(namesList, from, null, to.transform.position, to.Play);
         }
 
-        async UniTask IService.Initialize(CancellationToken cancellationToken)
-        {
-            _canvas = ServiceLocator.ServiceLocator.Get<IUIService>().Canvas;
-            _pool = new ObjectPool<Image>(OnCreateItem, OnGetItem, OnReleaseItem);
-            _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
-        }
-        
         void IService.Dispose()
         {
         }
@@ -138,5 +142,6 @@ namespace Modules.FlyItemsService
 
             await taskCompletionSource.Task;
         }
+
     }
 }

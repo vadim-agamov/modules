@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Modules.UIService
 {
-    public interface IUIService: IService
+    public interface IUIService: IInitializableService
     {
         Canvas Canvas { get; }
         UniTask Open<TModel>(TModel model, string key, CancellationToken cancellationToken) where TModel : UIModel;

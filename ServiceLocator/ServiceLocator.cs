@@ -12,63 +12,59 @@ namespace Modules.ServiceLocator
         private class ServiceItem
         {
             public IService Service;
-            public bool IsReady;
         }
-        
+
         private static readonly HashSet<ServiceItem> _services = new();
-        
+
         public static TService Get<TService>() where TService : class, IService
         {
             foreach (var serviceItem in _services)
             {
                 if (serviceItem.Service is TService serviceImplementation)
                 {
-                    if (!serviceItem.IsReady)
-                    {
-                        throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {typeof(TService).Name} is not ready.");
-                    }
-                    
                     return serviceImplementation;
                 }
             }
 
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {typeof(TService).Name} is not registered.");
         }
-        
-        public static async UniTask Register<TService>(TService service, CancellationToken token, params Type[] dependency) where TService : class, IService
+
+        public static IService Get(Type service)
+        {
+            foreach (var serviceItem in _services)
+            {
+                if (service.IsInstanceOfType(serviceItem.Service))
+                {
+                    return serviceItem.Service;
+                }
+            }
+
+            throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {service.Name} is not registered.");
+        }
+
+        public static IInitializableService[] GetInitializables() =>
+            _services
+                .Select(s => s.Service)
+                .OfType<IInitializableService>()
+                .ToArray();
+
+        public static TService Register<TService>(TService service) where TService : class, IService
         {
             if (_services.Any(s => s.Service.GetType() == typeof(TService)))
             {
                 throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Register: Service of type {typeof(TService)} already registered.");
             }
 
-            var serviceItem = new ServiceItem { Service = service, IsReady = false };
-            _services.Add(serviceItem);
-            
-            if (dependency.Any())
+            if (service is not IInitializableService && service.HasInitializationDependencyAttribute())
             {
-                var services = new List<ServiceItem>();
-                foreach (var dep in dependency)
-                {
-                    foreach (var item in _services)
-                    {
-                        var type = item.Service.GetType();
-                        if (dep.IsAssignableFrom(type))
-                        {
-                            services.Add(item);
-                        }
-                    }
-                }
-                
-                await UniTask.WaitWhile(() => services.Any(s => !s.IsReady), cancellationToken: token);
+                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Register: Service of type {typeof(TService)} must implement {nameof(IInitializableService)} interface.");
             }
-            
-            Debug.Log($"[{nameof(ServiceLocator)}] Initialize begin {typeof(TService).Name}");
-            await service.Initialize(token);
-            serviceItem.IsReady = true;
-            Debug.Log($"[{nameof(ServiceLocator)}] Initialize end {typeof(TService).Name}");
+
+            var serviceItem = new ServiceItem { Service = service };
+            _services.Add(serviceItem);
+            return service;
         }
-        
+
         public static void UnRegister<TService>() where TService : class, IService
         {
             foreach (var service in _services)
@@ -81,8 +77,11 @@ namespace Modules.ServiceLocator
                     return;
                 }
             }
-            
+
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] UnRegister: No service of type {typeof(TService).Name}");
         }
+
+        public static UniTask InitializeAllInitializables(CancellationToken token, IProgress<float> progress = null)
+            => new Initializator().InitializeAllInitializables(token, progress);
     }
 }
