@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Modules.ServiceLocator
+namespace Modules.ServiceLocator.Initializator
 {
     public static class InitializableExtensions
     { 

@@ -3,12 +3,17 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.PlatformService;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 
 namespace Modules.AnalyticsService
 {
     public class AnalyticsService: IAnalyticsService
     {
-        private readonly List<IAnalytic> _analytics = new List<IAnalytic>();
+        private readonly List<IAnalytic> _analytics = new ();
+
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
+
         
         [InitializationDependency]
         private IPlatformService PlatformService { get; set; }
@@ -59,7 +64,7 @@ namespace Modules.AnalyticsService
         async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             await UniTask.WhenAll(_analytics.Select(a => a.Initialize(cancellationToken)));
+            _isInitialized = true;
         }
-
     }
 }

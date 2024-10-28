@@ -2,12 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Modules.ServiceLocator
+namespace Modules.ServiceLocator.Initializator
 {
     internal class Node
     {
         public IInitializableService Initializable;
         public List<Node> Dependencies;
+        
+        public void Deconstruct(out IInitializableService initializable, out List<Node> dependencies)
+        {
+            initializable = Initializable;
+            dependencies = Dependencies;
+        }
     }
     
     internal class DependencyGraph

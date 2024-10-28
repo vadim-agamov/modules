@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using Modules.UIService;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,10 +18,14 @@ namespace Modules.CheatService
 
         private ICheatService This => this;
         
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
+        
         UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(CheatService)}]";
+            _isInitialized = true;
             return UniTask.CompletedTask;        
         }
 

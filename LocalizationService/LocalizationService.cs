@@ -4,6 +4,7 @@ using Modules.ServiceLocator;
 using Cysharp.Threading.Tasks;
 using Modules.Events;
 using Modules.PlatformService;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.LocalizationService
@@ -17,6 +18,8 @@ namespace Modules.LocalizationService
         private HashSet<LocalizationProviderConfig> _providers = new ();
         private Dictionary<string, string> _keys = new ();
         private Language _language;
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
         
         [InitializationDependency]
         private IPlatformService PlatformService { get; set; }
@@ -26,6 +29,7 @@ namespace Modules.LocalizationService
             PlatformService = ServiceLocator.ServiceLocator.Get<IPlatformService>();
             _language = PlatformService.GetLocale();
             Debug.Log($"[{nameof(LocalizationService)}] Current language: {_language}");
+            _isInitialized = true;
             return UniTask.CompletedTask;
         }
         

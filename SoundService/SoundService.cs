@@ -12,6 +12,7 @@ using UnityEngine.Pool;
 
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Modules.ServiceLocator.Initializator;
 
 
 namespace Modules.SoundService
@@ -24,6 +25,9 @@ namespace Modules.SoundService
         private IPropertyProvider<bool> IsMuted { get; set; }
 
         private readonly CancellationTokenSource _cancellationToken = new ();
+        
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
 
         private void Silence(bool silence)
         {
@@ -58,6 +62,8 @@ namespace Modules.SoundService
             _activeSources = new List<AudioSource>();
 
             Event<AppFocusState>.Subscribe(OnAppFocusStateChanged);
+            
+            _isInitialized = true;
         }
         
         private void OnAppFocusStateChanged(AppFocusState evt)

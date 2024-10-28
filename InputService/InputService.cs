@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,9 +17,13 @@ namespace Modules.InputService
         private PointerEventData _eventDataCurrentPosition;
         private bool _isReady;
         
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
+        
         UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             _raycastResult = new List<RaycastResult>();
+            _isInitialized = true;
             return UniTask.CompletedTask;
         }
 

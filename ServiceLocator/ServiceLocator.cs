@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.ServiceLocator
@@ -80,8 +81,5 @@ namespace Modules.ServiceLocator
 
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] UnRegister: No service of type {typeof(TService).Name}");
         }
-
-        public static UniTask InitializeAllInitializables(CancellationToken token, IProgress<float> progress = null)
-            => new Initializator().InitializeAllInitializables(token, progress);
     }
 }

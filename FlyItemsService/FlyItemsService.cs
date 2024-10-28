@@ -6,6 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using Modules.UIService;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -30,7 +31,9 @@ namespace Modules.FlyItemsService
         private Canvas _canvas;
         private FlyItemsConfig _config;
         private readonly List<FlyItemAnchor> _anchors = new();
-
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
+        
         [InitializationDependency] 
         private IUIService UiService { get; set; }
 
@@ -39,6 +42,7 @@ namespace Modules.FlyItemsService
             _canvas = UiService.Canvas;
             _pool = new ObjectPool<Image>(OnCreateItem, OnGetItem, OnReleaseItem);
             _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
+            _isInitialized = true;
         }
 
         private void OnReleaseItem(Image item)

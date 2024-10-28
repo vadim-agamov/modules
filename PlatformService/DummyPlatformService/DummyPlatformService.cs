@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.PlatformService.DummyPlatformService
 {
     public class DummyPlatformService : MonoBehaviour, IPlatformService
     {
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
+        
         UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
+            _isInitialized = true;
             return UniTask.CompletedTask;
         }
 

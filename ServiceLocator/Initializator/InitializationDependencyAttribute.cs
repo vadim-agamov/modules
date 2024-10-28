@@ -1,6 +1,6 @@
 using System;
 
-namespace Modules.ServiceLocator
+namespace Modules.ServiceLocator.Initializator
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class InitializationDependencyAttribute : Attribute

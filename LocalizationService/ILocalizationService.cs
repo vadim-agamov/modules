@@ -1,5 +1,6 @@
 using Modules.PlatformService;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 
 
 /*

@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.PlatformService;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -19,7 +20,8 @@ namespace Modules.PlayerDataService
         private bool _needSave;
         private bool _savingIsInProgress;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
         
         async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
@@ -45,7 +47,7 @@ namespace Modules.PlayerDataService
 
                 Data ??= new TData();
             }
-            
+            _isInitialized = true;
         }
 
         void IService.Dispose()

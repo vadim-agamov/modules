@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -15,6 +16,9 @@ namespace Modules.UIService
         private Canvas _canvas;
         private Vector2 ReferenceResolution { get; }
         Canvas IUIService.Canvas => _canvas;
+        
+        private bool _isInitialized;
+        public bool IsInitialized => _isInitialized;
 
         public UIService(Vector2 referenceResolution)
         {
@@ -24,6 +28,7 @@ namespace Modules.UIService
         UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
         {
             SetupCanvas();
+            _isInitialized = true;
             return UniTask.CompletedTask;
         }
 

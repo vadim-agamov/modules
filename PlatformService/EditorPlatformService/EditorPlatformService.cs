@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.PlatformService.EditorPlatformService
@@ -11,7 +12,8 @@ namespace Modules.PlatformService.EditorPlatformService
 	public class EditorPlatformService : MonoBehaviour, IPlatformService
 	{
 		private static string PlayerProgressPath => Path.Combine(Application.persistentDataPath, "player_progress.json");
-
+		private bool _isInitialized;
+		public bool IsInitialized => _isInitialized;
 		Language IPlatformService.GetLocale() => Language.English;
 
 		string IPlatformService.GetUserId() => SystemInfo.deviceUniqueIdentifier;
@@ -84,6 +86,7 @@ namespace Modules.PlatformService.EditorPlatformService
 		{
 			DontDestroyOnLoad(gameObject);
 			await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellationToken);
+			_isInitialized = true;
 		}
 	}
 }

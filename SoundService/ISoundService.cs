@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 
 namespace Modules.SoundService
 {

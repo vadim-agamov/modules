@@ -1,4 +1,5 @@
 using Modules.ServiceLocator;
+using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.InputService
