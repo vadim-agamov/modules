@@ -1,9 +1,8 @@
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 
 namespace Modules.CheatService
 {
-    public interface ICheatService : IInitializableService
+    public interface ICheatService : IInitializable
     {
         void Show();
         void Hide();

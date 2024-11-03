@@ -1,21 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.Initializator;
 using Modules.PlatformService;
 using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Modules.PlayerDataService
 {
-    public abstract class PlayerDataService<TData> : MonoBehaviour, IInitializableService
+    public abstract class PlayerDataService<TData> : MonoBehaviour, IInitializable, IDisposable
         where TData : new()
     {
-        [InitializationDependency]
-        protected IPlatformService PlatformService { get; set; } // protected since reflection can't see private fields
-        
+        private IPlatformService PlatformService { get; set; }
         protected TData Data;
         private bool _needSave;
         private bool _savingIsInProgress;
@@ -23,7 +20,14 @@ namespace Modules.PlayerDataService
         private bool _isInitialized;
         public bool IsInitialized => _isInitialized;
         
-        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        [Inject]
+        // protected since reflection can't see private fields in other assemblies
+        protected void Initialize(IPlatformService platformService)
+        {
+            PlatformService = platformService;
+        }
+        
+        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(PlayerDataService)}]";
@@ -50,7 +54,7 @@ namespace Modules.PlayerDataService
             _isInitialized = true;
         }
 
-        void IService.Dispose()
+        public void Dispose()
         {
             _cancellationTokenSource.Cancel();
         }

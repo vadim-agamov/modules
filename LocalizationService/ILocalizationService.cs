@@ -1,6 +1,5 @@
+using Modules.Initializator;
 using Modules.PlatformService;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
 
 
 /*
@@ -14,7 +13,7 @@ using Modules.ServiceLocator.Initializator;
 
 namespace Modules.LocalizationService
 {
-    public interface ILocalizationService: IInitializableService
+    public interface ILocalizationService: IInitializable
     {
         void SetLanguage(Language language);
         void Register(LocalizationProviderConfig providerConfig);

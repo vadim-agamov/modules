@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Modules.ServiceLocator.Initializator
+namespace Modules.Initializator
 {
     internal class Node
     {
-        public IInitializableService Initializable;
+        public IInitializable Initializable;
         public List<Node> Dependencies;
         
-        public void Deconstruct(out IInitializableService initializable, out List<Node> dependencies)
+        public void Deconstruct(out IInitializable initializable, out List<Node> dependencies)
         {
             initializable = Initializable;
             dependencies = Dependencies;
@@ -18,10 +18,10 @@ namespace Modules.ServiceLocator.Initializator
     
     internal class DependencyGraph
     {
-        private readonly Dictionary<IInitializableService, Node> _nodes = new ();
+        private readonly Dictionary<IInitializable, Node> _nodes = new ();
         private readonly HashSet<Node> _visited = new();
         
-        public void Add(IInitializableService initializable, params IInitializableService[] dependencies)
+        public void Add(IInitializable initializable, params IInitializable[] dependencies)
         {
             var node = GetOrCreateNode(initializable);
             node.Dependencies = dependencies.Select(GetOrCreateNode).ToList();
@@ -39,7 +39,7 @@ namespace Modules.ServiceLocator.Initializator
             return allDependencies;
         }
 
-        private Node GetOrCreateNode(IInitializableService initializable)
+        private Node GetOrCreateNode(IInitializable initializable)
         {
             if (!_nodes.ContainsKey(initializable))
             {

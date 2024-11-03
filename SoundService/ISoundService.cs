@@ -1,10 +1,10 @@
+using System;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 
 namespace Modules.SoundService
 {
-    public interface ISoundService: IInitializableService
+    public interface ISoundService: IInitializable, IDisposable
     {
         void PlayLoop(string soundId);
         UniTask Play(string soundId);

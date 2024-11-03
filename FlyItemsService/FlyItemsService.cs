@@ -5,8 +5,8 @@ using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Modules.Initializator;
 using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
 using Modules.UIService;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -16,7 +16,7 @@ using Random = UnityEngine.Random;
 
 namespace Modules.FlyItemsService
 {
-    public interface IFlyItemsService : IInitializableService
+    public interface IFlyItemsService : IInitializable//, IService
     {
         UniTask Fly(string name, string from, string to, int count);
         UniTask Fly(string name, Vector3 from, string to, int count);
@@ -31,18 +31,23 @@ namespace Modules.FlyItemsService
         private Canvas _canvas;
         private FlyItemsConfig _config;
         private readonly List<FlyItemAnchor> _anchors = new();
-        private bool _isInitialized;
-        public bool IsInitialized => _isInitialized;
-        
-        [InitializationDependency] 
-        private IUIService UiService { get; set; }
+        public bool IsInitialized { get; private set; }
 
-        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        private IUIService UiService { get; set; }
+        
+        
+        [Inject]
+        private void Initialize(IUIService uiService)
+        {
+            UiService = uiService;
+        }
+
+        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             _canvas = UiService.Canvas;
             _pool = new ObjectPool<Image>(OnCreateItem, OnGetItem, OnReleaseItem);
             _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
-            _isInitialized = true;
+            IsInitialized = true;
         }
 
         private void OnReleaseItem(Image item)
@@ -90,9 +95,6 @@ namespace Modules.FlyItemsService
             return Fly(namesList, from, null, to.transform.position, to.Play);
         }
 
-        void IService.Dispose()
-        {
-        }
 
         void IFlyItemsService.RegisterAnchor(FlyItemAnchor anchor) => _anchors.Add(anchor);
 

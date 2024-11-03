@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -25,7 +23,7 @@ namespace Modules.UIService
             ReferenceResolution = referenceResolution;
         }
         
-        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             SetupCanvas();
             _isInitialized = true;
@@ -57,10 +55,6 @@ namespace Modules.UIService
 
             Object.DontDestroyOnLoad(rootGameObject);
             Object.DontDestroyOnLoad(camera.gameObject);
-        }
-
-        void IService.Dispose()
-        {
         }
 
         async UniTask IUIService.Open<TModel>(TModel model, string key, CancellationToken cancellationToken)

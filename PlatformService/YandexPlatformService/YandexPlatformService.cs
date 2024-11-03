@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
+using Modules.Initializator;
 using Modules.ServiceLocator;
 using UnityEngine;
 
@@ -85,7 +86,7 @@ namespace Modules.PlatformService.YandexPlatformService
 
         void IPlatformService.GameReady() => YandexGameReady();
 
-        async UniTask IService.Initialize(CancellationToken cancellationToken)
+        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             _startGameCompletionSource = new UniTaskCompletionSource();
@@ -95,11 +96,12 @@ namespace Modules.PlatformService.YandexPlatformService
             This.PreloadInterstitial();
             This.PreloadRewardedVideo();
             This.PreloadRewardedInterstitial();
+            
+            IsInitialized = true;
         }
 
-        void IService.Dispose()
-        {
-        }
+        public bool IsInitialized { get; private set; }
+
 
         [UsedImplicitly]
         public void YandexOnGameStarted()

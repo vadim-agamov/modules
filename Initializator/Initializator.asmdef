@@ -1,11 +1,9 @@
 {
-    "name": "PlayerDataService",
+    "name": "Initializator",
     "rootNamespace": "",
     "references": [
-        "GUID:e309f58f5659d0c44af5111820aac19c",
-        "GUID:ae25a3bbdd56484bb19ecc8eb358d723",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:8a076f5e834b4690a83fff5e88e8ea43"
+        "GUID:e309f58f5659d0c44af5111820aac19c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

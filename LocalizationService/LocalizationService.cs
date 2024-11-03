@@ -3,8 +3,8 @@ using System.Threading;
 using Modules.ServiceLocator;
 using Cysharp.Threading.Tasks;
 using Modules.Events;
+using Modules.Initializator;
 using Modules.PlatformService;
-using Modules.ServiceLocator.Initializator;
 using UnityEngine;
 
 namespace Modules.LocalizationService
@@ -19,24 +19,29 @@ namespace Modules.LocalizationService
         private Dictionary<string, string> _keys = new ();
         private Language _language;
         private bool _isInitialized;
+        public UniTask Initialize(CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public bool IsInitialized => _isInitialized;
         
-        [InitializationDependency]
         private IPlatformService PlatformService { get; set; }
         
-        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        [Inject]
+        private void Initialize(IPlatformService platformService)
         {
-            PlatformService = ServiceLocator.ServiceLocator.Get<IPlatformService>();
+            PlatformService = platformService;
+        }
+        
+        UniTask IInitializable.Initialize(CancellationToken cancellationToken)
+        {
             _language = PlatformService.GetLocale();
             Debug.Log($"[{nameof(LocalizationService)}] Current language: {_language}");
             _isInitialized = true;
             return UniTask.CompletedTask;
         }
         
-        void IService.Dispose()
-        {
-        }
-
         void ILocalizationService.SetLanguage(Language language)
         {
             _language = language;

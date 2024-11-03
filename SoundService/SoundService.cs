@@ -5,14 +5,12 @@ using System.Threading;
 using Modules.Events;
 using Modules.PlatformService;
 using Modules.PlayerDataService;
-using Modules.ServiceLocator;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Pool;
-
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 
 
 namespace Modules.SoundService
@@ -25,9 +23,8 @@ namespace Modules.SoundService
         private IPropertyProvider<bool> IsMuted { get; set; }
 
         private readonly CancellationTokenSource _cancellationToken = new ();
-        
-        private bool _isInitialized;
-        public bool IsInitialized => _isInitialized;
+
+        public bool IsInitialized { get; private set; }
 
         private void Silence(bool silence)
         {
@@ -42,7 +39,7 @@ namespace Modules.SoundService
         }
         
 
-        async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(SoundService)}]";
@@ -63,7 +60,7 @@ namespace Modules.SoundService
 
             Event<AppFocusState>.Subscribe(OnAppFocusStateChanged);
             
-            _isInitialized = true;
+            IsInitialized = true;
         }
         
         private void OnAppFocusStateChanged(AppFocusState evt)
@@ -71,7 +68,7 @@ namespace Modules.SoundService
             Silence(!evt.IsFocus);
         }
 
-        void IService.Dispose()
+        public void Dispose()
         {
             Event<AppFocusState>.Unsubscribe(OnAppFocusStateChanged);
             
@@ -122,10 +119,10 @@ namespace Modules.SoundService
             {
                 if (audioSource.clip.name == soundId)
                 {
-                    // await audioSource.DOFade(0, 0.2f)
-                    //     .ToUniTask(cancellationToken: _cancellationToken.Token)
-                    //     .SuppressCancellationThrow();
-                    // audioSource.Stop();
+                    await audioSource.DOFade(0, 0.2f)
+                        .ToUniTask(cancellationToken: _cancellationToken.Token)
+                        .SuppressCancellationThrow();
+                    audioSource.Stop();
                     _objectPool.Release(audioSource);
                     break;
                 }

@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.Initializator;
+using Modules.LocalizationService;
 using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
 using Modules.UIService;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,34 +17,33 @@ namespace Modules.CheatService
         private bool _isReady;
 
         private ICheatService This => this;
-        
-        private bool _isInitialized;
-        public bool IsInitialized => _isInitialized;
-        
-        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        public bool IsInitialized  { get; private set; }
+
+        [Inject]
+        private void Initialize(ILocalizationService localizationService)
+        {
+        }
+
+        UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = $"[{nameof(CheatService)}]";
-            _isInitialized = true;
+            IsInitialized = true;
             return UniTask.CompletedTask;        
         }
 
         
-        void IService.Dispose()
-        {
-        }
-
         void ICheatService.Show()
         {
             _isShown = true;
-            var canvas = ServiceLocator.ServiceLocator.Get<IUIService>().Canvas;
+            var canvas = ServiceLocator.ServiceLocator.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = false;
         }
 
         void ICheatService.Hide()
         {
             _isShown = false;
-            var canvas = ServiceLocator.ServiceLocator.Get<IUIService>().Canvas;
+            var canvas = ServiceLocator.ServiceLocator.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = true;
         }
 

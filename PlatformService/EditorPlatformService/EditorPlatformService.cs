@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 using UnityEngine;
 
 namespace Modules.PlatformService.EditorPlatformService
@@ -13,6 +12,11 @@ namespace Modules.PlatformService.EditorPlatformService
 	{
 		private static string PlayerProgressPath => Path.Combine(Application.persistentDataPath, "player_progress.json");
 		private bool _isInitialized;
+		public UniTask Initialize(CancellationToken cancellationToken)
+		{
+			throw new NotImplementedException();
+		}
+
 		public bool IsInitialized => _isInitialized;
 		Language IPlatformService.GetLocale() => Language.English;
 
@@ -76,13 +80,8 @@ namespace Modules.PlatformService.EditorPlatformService
 		void IPlatformService.PreloadInterstitial()
 		{
 		}
-
 		
-		void IService.Dispose()
-		{
-		}
-		
-		async UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+		async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
 		{
 			DontDestroyOnLoad(gameObject);
 			await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellationToken);

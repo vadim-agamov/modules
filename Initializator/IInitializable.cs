@@ -1,9 +1,9 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace Modules.ServiceLocator.Initializator
+namespace Modules.Initializator
 {
-    public interface IInitializableService : IService
+    public interface IInitializable
     {
         UniTask Initialize(CancellationToken cancellationToken);
         bool IsInitialized { get; }

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -20,7 +19,7 @@ namespace Modules.InputService
         private bool _isInitialized;
         public bool IsInitialized => _isInitialized;
         
-        UniTask IInitializableService.Initialize(CancellationToken cancellationToken)
+        UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             _raycastResult = new List<RaycastResult>();
             _isInitialized = true;
@@ -28,10 +27,6 @@ namespace Modules.InputService
         }
 
         
-        void IService.Dispose()
-        {
-        }
-
         int IInputService.TouchesCount
         {
             get

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 
 namespace Modules.AnalyticsService
 {
@@ -14,7 +13,7 @@ namespace Modules.AnalyticsService
         void TrackEvent(string eventName, Dictionary<string, object> parameters);
     }
 
-    public interface IAnalyticsService: IInitializableService
+    public interface IAnalyticsService: IInitializable
     {
         void Start();
         void Stop();

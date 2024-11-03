@@ -1,27 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator.Initializator;
 using UnityEngine;
+using Object = System.Object;
 
 namespace Modules.ServiceLocator
 {
     public static class ServiceLocator
     {
-        private class ServiceItem
-        {
-            public IService Service;
-        }
+        private static readonly HashSet<Object> _services = new();
 
-        private static readonly HashSet<ServiceItem> _services = new();
-
-        public static TService Get<TService>() where TService : class, IService
+        public static TService Resolve<TService>() where TService : class
         {
-            foreach (var serviceItem in _services)
+            foreach (var service in _services)
             {
-                if (serviceItem.Service is TService serviceImplementation)
+                if (service is TService serviceImplementation)
                 {
                     return serviceImplementation;
                 }
@@ -30,50 +23,46 @@ namespace Modules.ServiceLocator
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {typeof(TService).Name} is not registered.");
         }
 
-        public static IService Get(Type service)
+        public static Object Get(Type service)
         {
-            foreach (var serviceItem in _services)
+            foreach (var s in _services)
             {
-                if (service.IsInstanceOfType(serviceItem.Service))
+                if (service.IsInstanceOfType(s))
                 {
-                    return serviceItem.Service;
+                    return s;
                 }
             }
-
+        
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {service.Name} is not registered.");
         }
 
-        public static IInitializableService[] GetInitializables() =>
-            _services
-                .Select(s => s.Service)
-                .OfType<IInitializableService>()
-                .ToArray();
+        public static T[] AllServices<T>() => _services.OfType<T>().ToArray();
 
-        public static TService Register<TService>(TService service) where TService : class, IService
+        public static TService Bind<TService>(TService service) where TService : class
         {
-            if (_services.Any(s => s.Service.GetType() == typeof(TService)))
+            if (_services.Any(s => s.GetType() == typeof(TService)))
             {
-                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Register: Service of type {typeof(TService)} already registered.");
+                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Bind: Service of type {typeof(TService)} already registered.");
             }
-
-            if (service is not IInitializableService && service.HasInitializationDependencyAttribute())
-            {
-                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Register: Service of type {typeof(TService)} must implement {nameof(IInitializableService)} interface.");
-            }
-
-            var serviceItem = new ServiceItem { Service = service };
-            _services.Add(serviceItem);
+            
+            Debug.Log($"[{nameof(ServiceLocator)}] Bind {typeof(TService).Name}");
+            DependencyUtils.InjectDependencies(service);
+            _services.Add(service);
             return service;
         }
+        
 
-        public static void UnRegister<TService>() where TService : class, IService
+        public static void UnBind<TService>() where TService : class
         {
             foreach (var service in _services)
             {
-                if (service.Service is TService _)
+                if (service is TService _)
                 {
                     Debug.Log($"[{nameof(ServiceLocator)}] UnRegister {typeof(TService).Name}, {service}");
-                    service.Service.Dispose();
+                    
+                    if(service is IDisposable disposable)
+                        disposable.Dispose();
+                    
                     _services.Remove(service);
                     return;
                 }

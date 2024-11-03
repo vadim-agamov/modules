@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
-using Modules.ServiceLocator.Initializator;
+using Modules.Initializator;
 
 namespace Modules.PlatformService
 {
-	public interface IPlatformService : IInitializableService
+	public interface IPlatformService : IInitializable
 	{
 		Language GetLocale();
 		string GetUserId();

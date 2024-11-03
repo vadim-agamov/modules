@@ -19,7 +19,7 @@ namespace Modules.LocalizationService
 
         private void OnEnable()
         {
-            LocalizationService = ServiceLocator.ServiceLocator.Get<ILocalizationService>();
+            LocalizationService = ServiceLocator.ServiceLocator.Resolve<ILocalizationService>();
             Localize();
             Event<LocalizationChangedEvent>.Subscribe(OnLocalizationChanged);
         }

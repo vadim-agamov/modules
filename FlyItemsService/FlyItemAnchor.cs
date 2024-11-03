@@ -17,12 +17,12 @@ namespace Modules.FlyItemsService
         
         private void OnEnable()
         {
-            ServiceLocator.ServiceLocator.Get<IFlyItemsService>().RegisterAnchor(this);
+            ServiceLocator.ServiceLocator.Resolve<IFlyItemsService>().RegisterAnchor(this);
         }
         
         private void OnDisable()
         {
-            ServiceLocator.ServiceLocator.Get<IFlyItemsService>().UnregisterAnchor(this);
+            ServiceLocator.ServiceLocator.Resolve<IFlyItemsService>().UnregisterAnchor(this);
         }
     }
 }
