@@ -20,7 +20,7 @@ namespace Modules.CheatService
         public bool IsInitialized  { get; private set; }
 
         [Inject]
-        private void Initialize(ILocalizationService localizationService)
+        private void Inject(ILocalizationService localizationService)
         {
         }
 

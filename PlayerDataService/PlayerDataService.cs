@@ -22,7 +22,7 @@ namespace Modules.PlayerDataService
         
         [Inject]
         // protected since reflection can't see private fields in other assemblies
-        protected void Initialize(IPlatformService platformService)
+        protected void Inject(IPlatformService platformService)
         {
             PlatformService = platformService;
         }

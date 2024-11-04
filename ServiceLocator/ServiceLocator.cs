@@ -23,7 +23,7 @@ namespace Modules.ServiceLocator
             throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {typeof(TService).Name} is not registered.");
         }
 
-        public static Object Get(Type service)
+        public static Object Resolve(Type service)
         {
             foreach (var s in _services)
             {

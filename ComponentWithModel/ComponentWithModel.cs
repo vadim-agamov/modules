@@ -17,6 +17,11 @@ namespace Modules.Extensions
             OnInitialize(parameters);
         }
         
+        public void UpdateModel(TModel model)
+        {
+            Model = model;
+        }
+        
         protected abstract void OnInitialize(params object[] parameters);
     }
     

@@ -37,7 +37,7 @@ namespace Modules.FlyItemsService
         
         
         [Inject]
-        private void Initialize(IUIService uiService)
+        private void Inject(IUIService uiService)
         {
             UiService = uiService;
         }

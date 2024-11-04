@@ -10,7 +10,7 @@ namespace Modules.ServiceLocator
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 
-        public static void InjectDependencies<T>(T service) where T : class
+        public static void InjectDependencies(object service)
         {
             if (!HasDependencies(service))
             {
@@ -18,7 +18,7 @@ namespace Modules.ServiceLocator
             }
             
             var dependencies = GetDependencies(service)
-                .Select(ServiceLocator.Get)
+                .Select(ServiceLocator.Resolve)
                 .ToArray();
             
             service

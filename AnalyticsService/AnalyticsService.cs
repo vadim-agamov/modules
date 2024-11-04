@@ -40,7 +40,7 @@ namespace Modules.AnalyticsService
         }
         
         [Inject]
-        private void Initialize(IPlatformService platformService)
+        private void Inject(IPlatformService platformService)
         {
             PlatformService = platformService;
         }

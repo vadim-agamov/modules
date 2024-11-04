@@ -29,7 +29,7 @@ namespace Modules.LocalizationService
         private IPlatformService PlatformService { get; set; }
         
         [Inject]
-        private void Initialize(IPlatformService platformService)
+        private void Inject(IPlatformService platformService)
         {
             PlatformService = platformService;
         }
