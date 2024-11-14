@@ -135,6 +135,23 @@ namespace Modules.Extensions
                 }
             }
         }
+        
+        public static IEnumerable<T> Where<T>(this T[,] self, Func<T, bool> func) where T : class
+        {
+            var dim0 = self.GetLength(0);
+            var dim1 = self.GetLength(1);
+
+            for (var i = 0; i < dim0; i++)
+            {
+                for (var j = 0; j < dim1; j++)
+                {
+                    if (func(self[i, j]))
+                    {
+                        yield return self[i, j];
+                    }
+                }
+            }
+        }
 
         public static TResult[,] Select<TSource, TResult>(this TSource[,] self, Func<TSource, TResult> selector)
         {

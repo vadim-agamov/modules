@@ -1,3 +1,5 @@
+using System;
+using Modules.Utils;
 using UnityEngine;
 
 namespace Modules.Extensions
@@ -17,21 +19,21 @@ namespace Modules.Extensions
             OnInitialize(parameters);
         }
         
-        public void UpdateModel(TModel model)
-        {
-            Model = model;
-        }
-        
+        public void Release() => Model = null;
+
+        public void UpdateModel(TModel model) => Model = model;
+
         protected abstract void OnInitialize(params object[] parameters);
     }
     
     public static class ComponentWithModelExtensions
     {
-        public static TComponent CreateView<TModel, TComponent>(this TModel model, TComponent prefab, Transform parent, params object[] parameters)
+        public static TComponent CreateView<TModel, TComponent>(this TModel model, Func<TComponent,TComponent> create, TComponent prefab, Transform parent, params object[] parameters)
             where TModel : ComponentModel
-            where TComponent : ComponentWithModel<TModel>
+            where TComponent : ComponentWithModel<TModel>, IPooledGameObject
         {
-            var component = Object.Instantiate(prefab, parent);
+            var component = create(prefab);
+            component.transform.SetParent(parent);
             component.Initialize(model, parameters);
             return component;
         }

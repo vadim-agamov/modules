@@ -1,3 +1,4 @@
 {
-  "name": "ComponentWithModel"
+  "name": "ComponentWithModel",
+  "references":[ "GUID:c974f25c364744d3b7af0dd7f5061f1b" ]
 }
