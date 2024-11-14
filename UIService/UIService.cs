@@ -43,18 +43,19 @@ namespace Modules.UIService
             canvasScaler.matchWidthOrHeight = 1;
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
-            var camera = new GameObject("[UICamera]").AddComponent<Camera>();
-            camera.transform.position = new Vector3(100, 0, 0);
-            camera.orthographic = true;
-            camera.clearFlags = CameraClearFlags.Nothing;
-            camera.orthographicSize = 10;
+            // var camera = new GameObject("[UICamera]").AddComponent<Camera>();
+            // camera.transform.position = new Vector3(100, 0, 0);
+            // camera.orthographic = true;
+            // camera.clearFlags = CameraClearFlags.Nothing;
+            // camera.orthographicSize = 10;
 
             _canvas = rootGameObject.GetComponent<Canvas>();
-            _canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            _canvas.worldCamera = camera;
+            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            // _canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            // _canvas.worldCamera = camera;
 
             Object.DontDestroyOnLoad(rootGameObject);
-            Object.DontDestroyOnLoad(camera.gameObject);
+            // Object.DontDestroyOnLoad(camera.gameObject);
         }
 
         async UniTask IUIService.Open<TModel>(TModel model, string key, CancellationToken cancellationToken)

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -16,11 +15,10 @@ using Random = UnityEngine.Random;
 
 namespace Modules.FlyItemsService
 {
-    public interface IFlyItemsService : IInitializable//, IService
+    public interface IFlyItemsService : IInitializable
     {
         UniTask Fly(string name, string from, string to, int count);
         UniTask Fly(string name, Vector3 from, string to, int count);
-        UniTask Fly(IReadOnlyList<(string Id, int Count)> names, Vector3 from, string to);
         void RegisterAnchor(FlyItemAnchor anchor);
         void UnregisterAnchor(FlyItemAnchor anchor);
     }
@@ -76,8 +74,7 @@ namespace Modules.FlyItemsService
         public UniTask Fly(string name, Vector3 from, string toId, int count)
         {
             var to = _anchors.First(x => x.Id == toId);
-            var names = Enumerable.Repeat(name, count).ToList();
-            return Fly(names, from, null, to.transform.position, to.Play);
+            return Fly(name, count, from, null, to.transform.position, to.Play);
         }
 
         public UniTask Fly(string name, string fromId, string toId, int count)
@@ -85,69 +82,71 @@ namespace Modules.FlyItemsService
             var from = _anchors.First(x => x.Id == fromId);
             var to = _anchors.First(x => x.Id == toId);
             var names = Enumerable.Repeat(name, count).ToList();
-            return Fly(names, from.transform.position, from.Play, to.transform.position, to.Play);
+            return Fly(name, count,from.transform.position, from.Play, to.transform.position, to.Play);
         }
-
-        public UniTask Fly(IReadOnlyList<(string Id, int Count)> names, Vector3 from, string toId)
-        {
-            var to = _anchors.First(x => x.Id == toId);
-            var namesList = names.SelectMany(x => Enumerable.Repeat(x.Id, x.Count)).ToList();
-            return Fly(namesList, from, null, to.transform.position, to.Play);
-        }
-
-
+        
         void IFlyItemsService.RegisterAnchor(FlyItemAnchor anchor) => _anchors.Add(anchor);
 
         void IFlyItemsService.UnregisterAnchor(FlyItemAnchor anchor) => _anchors.Remove(anchor);
 
-        private async UniTask Fly(IReadOnlyList<string> names, Vector3 from, Action<string,int> fromAction, Vector3 to, Action<string,int> toAction)
+        private static IReadOnlyList<int> DivideIntoNParts(int x, int n)
         {
-            var taskCompletionSource = new UniTaskCompletionSource();
+            if(x < n)
+            {
+                return Enumerable.Repeat(1, x).ToList();
+            }
+            
+            // Calculate the base value for each part
+            var baseValue = x / n;
+            // Calculate the remainder to be added to one of the parts
+            var remainder = x % n;
+
+            // Create the list with 'baseValue' repeated 'N' times
+            var parts = Enumerable.Repeat(baseValue, n).ToList();
+
+            // Add the remainder to the first element (or any one element as needed)
+            parts[0] += remainder;
+            return parts;
+        }
+        private async UniTask Fly(string id, int totalAmount, Vector3 from, Action<string,int> fromAction, Vector3 to, Action<string,int> toAction)
+        {
             from = new Vector3(from.x, from.y, _canvas.transform.position.z); 
 
             var distance = Vector3.Distance(from, to);
             
-            var midPoint = Vector3.Lerp(from, to, 0.2f);
-            var xDelta = distance * 0.2f;
+            var midPoint = Vector3.Lerp(from, to, 0.5f);
+            var xDelta = (from-to).x * 0.2f;
             var yDelta = distance * 0.2f;
-            midPoint = new Vector3(midPoint.x + Random.Range(-xDelta, xDelta), midPoint.y + Random.Range(-yDelta, yDelta), midPoint.z);
                 
             var sequence = DOTween.Sequence();
-            sequence.timeScale = 1.2f;
-            sequence.Pause();
-            for (var i = 0; i < names.Count; i++)
+  
+            
+            var amounts = DivideIntoNParts(totalAmount, 10);
+            for (var i = 0; i < amounts.Count; i++)
             {
-                var id = names[i];
+                var amount = amounts[i];
                 var item = _pool.Get();
                 item.sprite = _config.GetIcon(id);
                 item.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
                 item.transform.position = from;
 
                 fromAction?.Invoke(id, -1);
-                var localIndex = i;
 
+                midPoint = new Vector3(midPoint.x + Random.Range(-xDelta, xDelta), midPoint.y, midPoint.z);
+                
                 sequence
-                    .Insert(i * 0.1f, item.transform.DOScale(new Vector3(1.5f, 1.5f, 1.5f), 0.2f))
-                    .Insert(i * 0.1f + 0.2f, item.transform.DOScale(Vector3.one, 0.2f))
-                    .Insert(i * 0.5f + 0.4f,item.transform.DOPath(new[] {midPoint, to}, distance * 0.05f, PathType.CatmullRom)
+                    .Insert(i * 0.01f, item.transform.DOScale(new Vector3(1.5f, 1.5f, 1.5f), 0.2f))
+                    .Insert(i * 0.01f + 0.2f, item.transform.DOScale(Vector3.one, 0.2f))
+                    .Insert(i * 0.05f + 0.4f,item.transform.DOPath(new[] {midPoint, to}, distance /1000, PathType.CatmullRom)
                         .SetEase(Ease.InCubic)
                         .OnComplete(() =>
                         {
-                            if (localIndex == 0)
-                            {
-                                taskCompletionSource.TrySetResult();
-                                taskCompletionSource = null;
-                            }
-
                             _pool.Release(item);
-
-                            toAction?.Invoke(id, 1);
+                            toAction?.Invoke(id, amount);
                         }));
             }
-            sequence.Play();
 
-            await taskCompletionSource.Task;
+            await sequence.Play();
         }
-
     }
 }

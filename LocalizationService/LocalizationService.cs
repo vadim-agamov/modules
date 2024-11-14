@@ -18,14 +18,9 @@ namespace Modules.LocalizationService
         private HashSet<LocalizationProviderConfig> _providers = new ();
         private Dictionary<string, string> _keys = new ();
         private Language _language;
-        private bool _isInitialized;
-        public UniTask Initialize(CancellationToken cancellationToken)
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public bool IsInitialized => _isInitialized;
-        
+        public bool IsInitialized { get; private set; }
+
         private IPlatformService PlatformService { get; set; }
         
         [Inject]
@@ -38,7 +33,7 @@ namespace Modules.LocalizationService
         {
             _language = PlatformService.GetLocale();
             Debug.Log($"[{nameof(LocalizationService)}] Current language: {_language}");
-            _isInitialized = true;
+            IsInitialized = true;
             return UniTask.CompletedTask;
         }
         
