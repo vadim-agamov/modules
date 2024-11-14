@@ -14,14 +14,14 @@ namespace Editor.Build
         [MenuItem("Game/Build/YANDEX/BuildDev")]
         public static void BuildDev()
         {
-            SetFbDebugDefines();
+            SetDebugDefines();
             DoBuild();
         }
         
         [MenuItem("Game/Build/YANDEX/BuildProd")]
         public static void BuildProd()
         {
-            SetFbProdDefines();
+            SetProdDefines();
             DoBuild();
         }
         
@@ -57,13 +57,13 @@ namespace Editor.Build
         }
         
         [MenuItem("Game/Build/YANDEX/Set Defines Dev")]
-        public static void SetFbDebugDefines()
+        public static void SetDebugDefines()
         {
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.WebGL, DebugDefines);
         }
         
         [MenuItem("Game/Build/YANDEX/Set Defines Prod")]
-        public static void SetFbProdDefines()
+        public static void SetProdDefines()
         {
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.WebGL, ProdDefines);
         }

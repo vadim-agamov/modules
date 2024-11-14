@@ -11,9 +11,8 @@ namespace Modules.PlatformService.Editor.Build
         {
             var scenes = new []
             {
-                "Assets/Scenes/Loading.unity",
-                "Assets/Scenes/CoreMaze.unity",
-                "Assets/Scenes/Empty.unity"
+                "Assets/Scenes/GameStarter.unity",
+                "Assets/Scenes/Core.unity",
             };
 
             return scenes;
