@@ -32,7 +32,7 @@ namespace Modules.Initializator
         {
             var dependencies = DependencyUtils.HasDependencies(service)
                 ? DependencyUtils.GetDependencies(service)
-                    .Select(ServiceLocator.ServiceLocator.Resolve)
+                    .Select(ServiceLocator.Container.Resolve)
                     .OfType<IInitializable>()
                     .ToArray()
                 : Array.Empty<IInitializable>();

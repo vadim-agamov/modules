@@ -11,7 +11,7 @@ namespace Modules.AnalyticsService
         
         UniTask IAnalytic.Initialize(CancellationToken token)
         {
-            PlatformService = ServiceLocator.ServiceLocator.Resolve<IPlatformService>();
+            PlatformService = ServiceLocator.Container.Resolve<IPlatformService>();
             return UniTask.CompletedTask;
         }
 

@@ -18,7 +18,7 @@ namespace Modules.ServiceLocator
             }
             
             var dependencies = GetDependencies(service)
-                .Select(ServiceLocator.Resolve)
+                .Select(Container.Resolve)
                 .ToArray();
             
             service
@@ -46,7 +46,7 @@ namespace Modules.ServiceLocator
         private static MethodInfo Log(this MethodInfo method, object injectable, object[] dependency)
         {
             var dependencies = string.Join(", ", dependency.Select(d => d.GetType().Name));
-            Debug.Log($"[{nameof(ServiceLocator)}] Inject: {dependencies} to method {method.Name} of {injectable.GetType().Name}");
+            Debug.Log($"[{nameof(Container)}] Inject: {dependencies} to method {method.Name} of {injectable.GetType().Name}");
             return method;
         }
     }

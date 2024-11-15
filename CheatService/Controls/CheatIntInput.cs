@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Modules.CheatService.Controls
 {
-    public class CheatIntInput: CheatControl
+    public class CheatIntInput//: CheatControl
     {
         private readonly string _name;
         private int _value;
@@ -11,7 +11,7 @@ namespace Modules.CheatService.Controls
         private readonly Action<int> _action;
         private readonly Func<int> _getValue;
 
-        public CheatIntInput(ICheatService cheatService, string name, Func<int> getValue, Action<int> action) : base(cheatService)
+        public CheatIntInput(ICheatService cheatService, string name, Func<int> getValue, Action<int> action)
         {
             _name = name;
             _action = action;
@@ -47,7 +47,7 @@ namespace Modules.CheatService.Controls
             {
                 _isDirty = false;
                 _action?.Invoke(_value);
-                HideCheats();
+                // HideCheats();
             }
             GUILayout.EndHorizontal();
         }

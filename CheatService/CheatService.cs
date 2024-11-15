@@ -36,14 +36,14 @@ namespace Modules.CheatService
         void ICheatService.Show()
         {
             _isShown = true;
-            var canvas = ServiceLocator.ServiceLocator.Resolve<IUIService>().Canvas;
+            var canvas = ServiceLocator.Container.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = false;
         }
 
         void ICheatService.Hide()
         {
             _isShown = false;
-            var canvas = ServiceLocator.ServiceLocator.Resolve<IUIService>().Canvas;
+            var canvas = ServiceLocator.Container.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = true;
         }
 

@@ -6,7 +6,7 @@ using Object = System.Object;
 
 namespace Modules.ServiceLocator
 {
-    public static class ServiceLocator
+    public static class Container
     {
         private static readonly HashSet<Object> _services = new();
 
@@ -20,7 +20,7 @@ namespace Modules.ServiceLocator
                 }
             }
 
-            throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {typeof(TService).Name} is not registered.");
+            throw new InvalidOperationException($"[{nameof(Container)}] Get: Service of type {typeof(TService).Name} is not registered.");
         }
 
         public static Object Resolve(Type service)
@@ -33,7 +33,7 @@ namespace Modules.ServiceLocator
                 }
             }
         
-            throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Get: Service of type {service.Name} is not registered.");
+            throw new InvalidOperationException($"[{nameof(Container)}] Get: Service of type {service.Name} is not registered.");
         }
 
         public static T[] AllServices<T>() => _services.OfType<T>().ToArray();
@@ -44,10 +44,10 @@ namespace Modules.ServiceLocator
         {
             if (_services.Any(s => s.GetType() == typeof(T)))
             {
-                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Bind: Service of type {typeof(T)} already registered.");
+                throw new InvalidOperationException($"[{nameof(Container)}] Bind: Service of type {typeof(T)} already registered.");
             }
             
-            Debug.Log($"[{nameof(ServiceLocator)}] Bind {typeof(T).Name} to {typeof(TImpl).Name}");
+            Debug.Log($"[{nameof(Container)}] Bind {typeof(T).Name} to {typeof(TImpl).Name}");
             _services.Add(service);
             return service;
         }
@@ -56,10 +56,10 @@ namespace Modules.ServiceLocator
         {
             if (_services.Any(s => s.GetType() == typeof(T)))
             {
-                throw new InvalidOperationException($"[{nameof(ServiceLocator)}] Bind: Service of type {typeof(T)} already registered.");
+                throw new InvalidOperationException($"[{nameof(Container)}] Bind: Service of type {typeof(T)} already registered.");
             }
             
-            Debug.Log($"[{nameof(ServiceLocator)}] Bind {typeof(T).Name}");
+            Debug.Log($"[{nameof(Container)}] Bind {typeof(T).Name}");
             _services.Add(service);
             return service;
         }
@@ -92,7 +92,7 @@ namespace Modules.ServiceLocator
             {
                 if (service is TService _)
                 {
-                    Debug.Log($"[{nameof(ServiceLocator)}] UnRegister {typeof(TService).Name}, {service}");
+                    Debug.Log($"[{nameof(Container)}] UnRegister {typeof(TService).Name}, {service}");
                     
                     if(service is IDisposable disposable)
                         disposable.Dispose();
@@ -102,7 +102,7 @@ namespace Modules.ServiceLocator
                 }
             }
 
-            throw new InvalidOperationException($"[{nameof(ServiceLocator)}] UnRegister: No service of type {typeof(TService).Name}");
+            throw new InvalidOperationException($"[{nameof(Container)}] UnRegister: No service of type {typeof(TService).Name}");
         }
     }
 }
