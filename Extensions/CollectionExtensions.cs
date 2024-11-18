@@ -201,6 +201,20 @@ namespace Modules.Extensions
                 }
             }
         }
+        
+        public static void ForEach<T>(this T[,] self, Action<T> func)
+        {
+            var dim0 = self.GetLength(0);
+            var dim1 = self.GetLength(1);
+
+            for (var i = 0; i < dim0; i++)
+            {
+                for (var j = 0; j < dim1; j++)
+                {
+                    func(self[i, j]);
+                }
+            }
+        }
 
         public static int Count<T>(this T[,] self, Func<T, bool> func)
         {

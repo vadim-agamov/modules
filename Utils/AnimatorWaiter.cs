@@ -38,36 +38,26 @@ namespace Modules.Utils
         
         public async UniTask WaitState(string state, float duration = float.MaxValue, CancellationToken token = default)
         {
-            Cleanup();
+            Debug.Assert(_handlers.All(h => h.StateNameHash != Animator.StringToHash(state)), $"[{nameof(AnimatorWaiter)}] There are handlers for {state}");
 
             var animationEventHandler = new AnimationEventHandler(state, duration);
             _handlers.AddLast(animationEventHandler);
             // Debug.Log($"[{nameof(AnimatorWaiter)}|{animationEventHandler.Id}] BEGIN SetTriggerAsync {state}");
-            await animationEventHandler.CompletionSource.Task;
             
-            token.Register(() =>
-            {
-                Debug.LogWarning($"[{nameof(AnimatorWaiter)}|{animationEventHandler.Id}] CANCELLED awaiter for {state} {animationEventHandler.StateNameHash}");
-                animationEventHandler.CompletionSource.TrySetCanceled();
-                _handlers.Remove(animationEventHandler);
-            });
+            await animationEventHandler.CompletionSource.Task.AttachExternalCancellation(token);
+            
+            await UniTask.Yield();
             
             // Debug.Log($"[{nameof(AnimatorWaiter)}|{animationEventHandler.Id}] END SetTriggerAsync {state}");
-
-            void Cleanup()
-            {
-                var handlersToRemove = _handlers.Where(handler => handler.StateNameHash ==  Animator.StringToHash(state)).ToList();
-                handlersToRemove.ForEach(h =>
-                {
-                    Debug.LogWarning($"[{nameof(AnimatorWaiter)}|{h.Id}] CLEANED awaiter for {state} {h.StateNameHash}");
-                    h.CompletionSource.TrySetResult();
-                    _handlers.Remove(h);
-                });
-            }
         }
 
         private void Update()
         {
+            foreach (var handler in _handlers)
+            {
+                handler.MaxDuration -= Time.deltaTime;
+            }
+
             Complete();
             CompleteExpired();
         }
@@ -76,39 +66,35 @@ namespace Modules.Utils
         {
             var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
             var currentStateHash = stateInfo.shortNameHash;
-            if (currentStateHash != _lastStateHash)
+            if (currentStateHash == _lastStateHash)
             {
-                _lastStateHash = currentStateHash;
-                
-               var handlersToRemove = _handlers.Where(handler => stateInfo.shortNameHash == handler.StateNameHash).ToList();
-
-                handlersToRemove.ForEach(h =>
-                {
-                    // Debug.Log($"[{nameof(AnimatorWaiter)}|{h.Id}] COMPLETED animation trigger {h.StateNameHash}");
-                    h.CompletionSource.TrySetResult();
-                    _handlers.Remove(h);
-                });
+                return;
             }
+            
+            _lastStateHash = currentStateHash;
+            
+            while (_handlers.Any(h => h.StateNameHash == currentStateHash))
+            {
+                var h = _handlers.First(h => h.StateNameHash == currentStateHash);
+                _handlers.Remove(h);
+                h.CompletionSource.TrySetResult();
+                // Debug.Log($"[{nameof(AnimatorWaiter)}|{h.Id}] COMPLETED animation trigger {h.StateNameHash}");
+            }
+                
+            Debug.Assert(_handlers.All(h => h.StateNameHash != currentStateHash), $"[{nameof(AnimatorWaiter)}] There are still handlers for {currentStateHash}");
         }
 
         private void CompleteExpired()
         {
-            var handlersToRemove = new List<AnimationEventHandler>();
-            foreach (var handler in _handlers)
+            while (_handlers.Any(h => h.MaxDuration < 0))
             {
-                handler.MaxDuration -= Time.deltaTime;
-                if (handler.MaxDuration < 0)
-                {
-                    Debug.LogWarning($"[{nameof(AnimatorWaiter)}|{handler.Id}] EXPIRED animation trigger {handler.StateNameHash}");
-                    handlersToRemove.Add(handler);
-                }
-            }
-
-            handlersToRemove.ForEach(h =>
-            {
-                h.CompletionSource.TrySetResult();
+                var h = _handlers.First(h =>  h.MaxDuration < 0);
                 _handlers.Remove(h);
-            });
+                h.CompletionSource.TrySetResult();
+                // Debug.Log($"[{nameof(AnimatorWaiter)}|{h.Id}] COMPLETED animation trigger {h.StateNameHash}");
+            }
+            
+            Debug.Assert(_handlers.All(h => h.MaxDuration > 0), $"[{nameof(AnimatorWaiter)}] There are still handlers with expired duration");
         }
 
         private void OnValidate()

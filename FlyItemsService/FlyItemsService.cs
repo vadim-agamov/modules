@@ -11,43 +11,24 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Pool;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Modules.FlyItemsService
 {
-    public interface IFlyItemsService : IInitializable
+    public class FlyToTargetAnimation
     {
-        UniTask Fly(string name, string from, string to, int count);
-        UniTask Fly(string name, Vector3 from, string to, int count);
-        void RegisterAnchor(FlyItemAnchor anchor);
-        void UnregisterAnchor(FlyItemAnchor anchor);
-    }
-    
-    public class FlyItemsService: IFlyItemsService
-    {
-        private ObjectPool<Image> _pool;
-        private Canvas _canvas;
-        private FlyItemsConfig _config;
-        private readonly List<FlyItemAnchor> _anchors = new();
-        public bool IsInitialized { get; private set; }
+        private readonly ObjectPool<Image> _pool;
+        private readonly Canvas _canvas;
+        private readonly FlyItemsConfig _config;
 
-        private IUIService UiService { get; set; }
-        
-        
-        [Inject]
-        private void Inject(IUIService uiService)
+        public FlyToTargetAnimation(FlyItemsConfig config, Canvas canvas)
         {
-            UiService = uiService;
-        }
-
-        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
-        {
-            _canvas = UiService.Canvas;
+            _config = config;
+            _canvas = canvas;
             _pool = new ObjectPool<Image>(OnCreateItem, OnGetItem, OnReleaseItem);
-            _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
-            IsInitialized = true;
         }
-
+        
         private void OnReleaseItem(Image item)
         {
             item.transform.position = Vector3.zero;
@@ -70,25 +51,7 @@ namespace Modules.FlyItemsService
             image.preserveAspect = true;
             return image;
         }
-
-        public UniTask Fly(string name, Vector3 from, string toId, int count)
-        {
-            var to = _anchors.First(x => x.Id == toId);
-            return Fly(name, count, from, null, to.transform.position, to.Play);
-        }
-
-        public UniTask Fly(string name, string fromId, string toId, int count)
-        {
-            var from = _anchors.First(x => x.Id == fromId);
-            var to = _anchors.First(x => x.Id == toId);
-            var names = Enumerable.Repeat(name, count).ToList();
-            return Fly(name, count,from.transform.position, from.Play, to.transform.position, to.Play);
-        }
         
-        void IFlyItemsService.RegisterAnchor(FlyItemAnchor anchor) => _anchors.Add(anchor);
-
-        void IFlyItemsService.UnregisterAnchor(FlyItemAnchor anchor) => _anchors.Remove(anchor);
-
         private static IReadOnlyList<int> DivideIntoNParts(int x, int n)
         {
             if(x < n)
@@ -108,7 +71,8 @@ namespace Modules.FlyItemsService
             parts[0] += remainder;
             return parts;
         }
-        private async UniTask Fly(string id, int totalAmount, Vector3 from, Action<string,int> fromAction, Vector3 to, Action<string,int> toAction)
+               
+        public async UniTask Play(string id, int totalAmount, Vector3 from, Action<string,int> fromAction, Vector3 to, Action<string,int> toAction)
         {
             from = new Vector3(from.x, from.y, _canvas.transform.position.z); 
 
@@ -148,5 +112,120 @@ namespace Modules.FlyItemsService
 
             await sequence.Play();
         }
+
     }
+
+    public class FlyUpAnimation
+    {
+        private readonly ObjectPool<FlyUpItemView> _pool;
+        private readonly FlyItemsConfig _config;
+        private readonly Canvas _canvas;
+
+        public FlyUpAnimation(FlyItemsConfig config, Canvas canvas)
+        {
+            _config = config;
+            _canvas = canvas;
+            _pool = new ObjectPool<FlyUpItemView>(OnCreateItem, OnGetItem, OnReleaseItem);
+        }
+
+        private void OnReleaseItem(FlyUpItemView item)
+        {
+            item.ResetView();
+            item.gameObject.SetActive(false);
+        }
+
+        private void OnGetItem(FlyUpItemView item)
+        {
+            item.gameObject.SetActive(true);
+            item.gameObject.transform.SetAsLastSibling();
+        }
+
+        private FlyUpItemView OnCreateItem()
+        {
+            return Object.Instantiate(_config.FlyUpItemViewPrefab, _canvas.transform);
+        }
+
+        public async UniTask Play(Vector3 worldPosition, int amount)
+        {
+            var item = _pool.Get();
+            item.transform.position = worldPosition;
+            await item.Play(amount);
+            _pool.Release(item);
+        }
+    }
+
+    public class FlyItemsService: IFlyItemsService
+    {
+        private FlyUpAnimation _flyUpAnimation;
+        private FlyToTargetAnimation _flyToTargetAnimation;
+
+        private FlyItemsConfig _config;
+        private readonly List<FlyItemAnchor> _anchors = new();
+        public bool IsInitialized { get; private set; }
+
+        private IUIService UiService { get; set; }
+        
+        
+        [Inject]
+        private void Inject(IUIService uiService)
+        {
+            UiService = uiService;
+        }
+
+        async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
+        {
+            _config = await Addressables.LoadAssetAsync<FlyItemsConfig>("FlyItemsConfig");
+            _flyUpAnimation = new FlyUpAnimation(_config, UiService.Canvas);
+            _flyToTargetAnimation = new FlyToTargetAnimation(_config, UiService.Canvas);
+            IsInitialized = true;
+        }
+        
+        async UniTask IFlyItemsService.Fly(string name, Vector3 from, string toId, int count, FlyType type)
+        {
+            var to = _anchors.First(x => x.Id == toId);
+
+            switch (type)
+            {
+                case FlyType.FlyToTarget:
+                    await _flyToTargetAnimation.Play(name, count, from, null, to.transform.position, null);
+                    break;
+                
+                case FlyType.FlyUp:
+                    await _flyUpAnimation.Play(from, count);
+                    to.Play(name, count);
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                
+            }
+        }
+
+        async UniTask IFlyItemsService.Fly(string name, string fromId, string toId, int count, FlyType type)
+        {
+            var from = _anchors.First(x => x.Id == fromId);
+            var to = _anchors.First(x => x.Id == toId);
+
+            switch (type)
+            {
+                case FlyType.FlyToTarget:
+                    await _flyToTargetAnimation.Play(name, count, from.transform.position, from.Play, to.transform.position, to.Play);
+                    break;
+                
+                case FlyType.FlyUp:
+                    from.Play(name, count);
+                    await _flyUpAnimation.Play(from.transform.position, count);
+                    to.Play(name, count);
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                
+            }
+        }
+        
+        void IFlyItemsService.RegisterAnchor(FlyItemAnchor anchor) => _anchors.Add(anchor);
+
+        void IFlyItemsService.UnregisterAnchor(FlyItemAnchor anchor) => _anchors.Remove(anchor);
+     }
 }

@@ -14,8 +14,14 @@ namespace Modules.FlyItemsService
     [CreateAssetMenu(fileName = "FlyItemsConfig", menuName = "Configs/FlyItemsConfig", order = 0)]
     public class FlyItemsConfig : ScriptableObject
     {
-        [SerializeField] private FlyItemIcon[] _icons;
+        [SerializeField]
+        private FlyItemIcon[] _icons;
+        
+        [SerializeField]
+        private FlyUpItemView _flyUpItemViewPrefab;
 
+        public FlyUpItemView FlyUpItemViewPrefab => _flyUpItemViewPrefab;
+        
         public Sprite GetIcon(string n) => _icons.First(x => x.Name == n).Icon;
 
         private void OnValidate()

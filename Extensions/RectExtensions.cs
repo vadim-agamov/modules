@@ -14,5 +14,8 @@ namespace Modules.Extensions
         
             return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
         }
+        
+        public static Rect Expand(this Rect rect, float value) => 
+            new(rect.x - value, rect.y - value, rect.width + value * 2, rect.height + value * 2);
     }
 }

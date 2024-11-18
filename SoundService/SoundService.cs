@@ -20,7 +20,8 @@ namespace Modules.SoundService
         private SoundsConfig _config;
         private ObjectPool<AudioSource> _objectPool;
         private List<AudioSource> _activeSources;
-        private IPropertyProvider<bool> IsMuted { get; set; }
+        // private IPropertyProvider<bool> IsMuted { get; set; }
+        private bool IsMuted { get; set; }
 
         private readonly CancellationTokenSource _cancellationToken = new ();
 
@@ -32,12 +33,12 @@ namespace Modules.SoundService
             AudioListener.volume = silence ? 0 : 1;
         }
 
-        public SoundService BindProperty(IPropertyProvider<bool> isMuted)
-        {
-            IsMuted = isMuted;
-            return this;
-        }
-        
+        // public SoundService BindProperty(IPropertyProvider<bool> isMuted)
+        // {
+        //     IsMuted = isMuted;
+        //     return this;
+        // }
+        //
 
         async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
@@ -47,6 +48,12 @@ namespace Modules.SoundService
             _config = await Addressables.LoadAssetAsync<SoundsConfig>("SoundsConfig").ToUniTask(cancellationToken: cancellationToken);
 
             var clips = _config.GetAllAudioClips().ToList();
+            
+            clips.ForEach(clip =>
+            {
+                clip.LoadAudioData();
+            });
+            
             await UniTask.WaitUntil(() => clips.All(clip =>
             {
                 Debug.Log($"[{nameof(SoundService)}] {clip.name}: {clip.loadState}");
@@ -89,13 +96,13 @@ namespace Modules.SoundService
             }
 
             source.loop = true;
-            source.mute = IsMuted.Value;
+            source.mute = IsMuted;
             source.Play();
         }
 
         async UniTask ISoundService.Play(string soundId)
         {
-            Debug.Log($"[{nameof(SoundService)}] Play {soundId}");
+            // Debug.Log($"[{nameof(SoundService)}] Play {soundId}");
             var source = _objectPool.Get();
             if (source.clip == null || source.clip.name != soundId)
             {
@@ -104,7 +111,7 @@ namespace Modules.SoundService
             }
 
             source.loop = false;
-            source.mute = IsMuted.Value;
+            source.mute = IsMuted;
             source.Play();
 
             await UniTask
@@ -131,7 +138,7 @@ namespace Modules.SoundService
 
         void ISoundService.Mute()
         {
-            IsMuted.Value = true;
+            IsMuted = true;
             foreach (var activeSource in _activeSources)
             {
                 activeSource.mute = true;
@@ -140,13 +147,13 @@ namespace Modules.SoundService
 
         void ISoundService.UnMute()
         {
-            IsMuted.Value = false;
+            IsMuted = false;
             foreach (var activeSource in _activeSources)
             {
                 activeSource.mute = false;
             }
         }
-        bool ISoundService.IsMuted => IsMuted.Value;
+        bool ISoundService.IsMuted => IsMuted;
 
         #region Pool
 
