@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Modules.FSM
+namespace Modules.Fsm
 {
     public sealed class Fsm
     {

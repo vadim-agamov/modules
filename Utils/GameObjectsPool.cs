@@ -41,7 +41,7 @@ namespace Modules.Utils
         {
             if (!_pools.TryGetValue(view.Id, out var pool))
             {
-                throw new InvalidOperationException($"Pool for {view.GameObject.name} not found");
+                throw new InvalidOperationException($"Pool for {view.GameObject.name}|{view.Id} not found");
             }
             
             pool.Release(view);

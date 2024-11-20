@@ -6,8 +6,8 @@ namespace Modules.UIService
     public abstract class UIModel
     {
         internal IViewControl ViewControl { get; set; }
-        public UniTask Show(CancellationToken token) => ViewControl.Show(token);
-        public UniTask Hide(CancellationToken token) => ViewControl.Hide(token);
+        public UniTask ShowView(CancellationToken token) => ViewControl.Show(token);
+        public UniTask HideView(CancellationToken token) => ViewControl.Hide(token);
         public void UpdateModel() => ViewControl.UpdateModel();
     }
 }

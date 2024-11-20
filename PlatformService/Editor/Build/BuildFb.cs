@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.Threading;
-using Modules.PlatformService.Editor.Build;
 using Unity.SharpZipLib.Utils;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Editor.Build
+namespace Modules.PlatformService.Editor.Build
 {
     public static class BuildFb
     {

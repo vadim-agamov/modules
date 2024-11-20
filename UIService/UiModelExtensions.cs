@@ -15,7 +15,7 @@ namespace Modules.UIService
 
         public static async UniTask Show(this UIModel model, CancellationToken cancellationToken)
         {
-            await model.Show(cancellationToken);
+            await model.ShowView(cancellationToken);
             Event<UiShowEvent>.Publish(new UiShowEvent(model));
         }
 
@@ -27,7 +27,7 @@ namespace Modules.UIService
 
         public static async UniTask Hide(this UIModel model, CancellationToken cancellationToken)
         {
-            await model.Hide(cancellationToken);
+            await model.HideView(cancellationToken);
             Event<UiHideEvent>.Publish(new UiHideEvent(model));
         }
 

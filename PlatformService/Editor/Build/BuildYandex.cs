@@ -1,10 +1,9 @@
 using System.IO;
-using Modules.PlatformService.Editor.Build;
 using Unity.SharpZipLib.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.Build
+namespace Modules.PlatformService.Editor.Build
 {
     public static class BuildYandex
     {

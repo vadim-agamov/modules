@@ -20,7 +20,7 @@ namespace Modules.SoundService
         private SoundsConfig _config;
         private ObjectPool<AudioSource> _objectPool;
         private List<AudioSource> _activeSources;
-        // private IPropertyProvider<bool> IsMuted { get; set; }
+
         private bool IsMuted { get; set; }
 
         private readonly CancellationTokenSource _cancellationToken = new ();
@@ -32,14 +32,7 @@ namespace Modules.SoundService
             AudioListener.pause = silence;
             AudioListener.volume = silence ? 0 : 1;
         }
-
-        // public SoundService BindProperty(IPropertyProvider<bool> isMuted)
-        // {
-        //     IsMuted = isMuted;
-        //     return this;
-        // }
-        //
-
+        
         async UniTask IInitializable.Initialize(CancellationToken cancellationToken)
         {
             DontDestroyOnLoad(gameObject);

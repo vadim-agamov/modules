@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using static Unity.Services.Analytics.AnalyticsService;
+using Unity.Services.Core;
 
 namespace Modules.AnalyticsService
 {
@@ -9,13 +9,13 @@ namespace Modules.AnalyticsService
     {
         async UniTask IAnalytic.Initialize(CancellationToken token)
         {
-            // await InitializeAsync();
+            await UnityServices.InitializeAsync();
         }
 
-        void IAnalytic.Start() => Instance.StartDataCollection();
+        void IAnalytic.Start() => Unity.Services.Analytics.AnalyticsService.Instance.StartDataCollection();
 
-        void IAnalytic.Stop() =>  Instance.StopDataCollection();
+        void IAnalytic.Stop() => Unity.Services.Analytics.AnalyticsService.Instance.StopDataCollection();
 
-        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters) => Instance.RecordEvent(eventName);
+        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters) => Unity.Services.Analytics.AnalyticsService.Instance.RecordEvent(eventName);
     }
 }

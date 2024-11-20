@@ -85,7 +85,9 @@ namespace Modules.CheatService
 
         private void DrawCheats()
         {
-            GUILayout.BeginArea(new Rect(120, 120, Screen.width - 240, Screen.height - 240));
+            const int width = 600;
+            GUILayout.BeginArea(new Rect(Screen.width/2f - width/2f, 120, width, Screen.height - 240));
+            GUILayout.BeginVertical();
             foreach (var cheatsProvider in _cheatsProviders)
             {
                 GUILayout.BeginVertical(cheatsProvider.Id, "box");
@@ -94,6 +96,7 @@ namespace Modules.CheatService
                 GUILayout.EndVertical();
                 GUILayout.Space(10);
             }
+            GUILayout.EndVertical();
             GUILayout.EndArea();
         }
 

@@ -35,12 +35,12 @@ namespace Modules.UIService
             var rootGameObject = new GameObject(
                 "[RootCanvas]",
                 typeof(Canvas),
-                typeof(CanvasScaler),
+                typeof(CustomCanvasScreenSizeScaler),
                 typeof(GraphicRaycaster));
 
-            var canvasScaler = rootGameObject.GetComponent<CanvasScaler>();
+            var canvasScaler = rootGameObject.GetComponent<CustomCanvasScreenSizeScaler>();
             canvasScaler.referenceResolution = ReferenceResolution;
-            canvasScaler.matchWidthOrHeight = 1;
+            canvasScaler.matchWidthOrHeight = 0;
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
             // var camera = new GameObject("[UICamera]").AddComponent<Camera>();

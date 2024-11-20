@@ -1,8 +1,7 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace Modules.FSM
+namespace Modules.Fsm
 {
     public interface IState
     {

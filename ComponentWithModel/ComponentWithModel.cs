@@ -2,7 +2,7 @@ using System;
 using Modules.Utils;
 using UnityEngine;
 
-namespace Modules.Extensions
+namespace Modules.ComponentWithModel
 {
     public abstract class ComponentModel
     {
