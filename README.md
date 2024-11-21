@@ -78,7 +78,7 @@ Container.UnBind<IFlyItemsService>();
 
 This class perform instances initialization in proper order. 
 1. It recursevly collect dependencies from methods marked with `[Inject]` attribute
-2. Build dependency graph
+2. Build [dependency graph](./Initializator/DependencyGraph.cs)
 3. Calculate proper order
 4. Call `IInitializable.Initialize()` methods in that order
 
