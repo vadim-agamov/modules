@@ -16,6 +16,14 @@ namespace Modules.AnalyticsService
 
         void IAnalytic.Stop() => Unity.Services.Analytics.AnalyticsService.Instance.StopDataCollection();
 
-        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters) => Unity.Services.Analytics.AnalyticsService.Instance.RecordEvent(eventName);
+        void IAnalytic.TrackEvent(string eventName, Dictionary<string, object> parameters)
+        {
+            var customEvent = new Unity.Services.Analytics.CustomEvent(eventName);
+            foreach (var (k,v) in parameters)
+            {
+                customEvent.Add(k, v);
+            }
+            Unity.Services.Analytics.AnalyticsService.Instance.RecordEvent(customEvent);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace Modules.FigmaImporter.Editor
     public class FigmaNodeImporter : ScriptableObject
     {
         [SerializeField]
-        private string _figmaToken;
+        private FigmaToken _figmaToken;
 
         [SerializeField]
         private string _figmaProjectId;
@@ -40,6 +40,14 @@ namespace Modules.FigmaImporter.Editor
         private const string TEXTURE_FORMAT = "png";
 
         private static CancellationTokenSource _cancellationTokenSource;
+
+        private void OnValidate()
+        {
+            _figmaToken = AssetDatabase.FindAssets("t:FigmaToken")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<FigmaToken>)
+                .FirstOrDefault();
+        }
 
         public void Import()
         {
@@ -143,7 +151,7 @@ namespace Modules.FigmaImporter.Editor
         private async UniTask<JObject> DownloadFigmaFile(string node)
         {
             var request = UnityWebRequest.Get($"https://api.figma.com/v1/files/{_figmaProjectId}/nodes?ids={node}&depth=2");
-            request.SetRequestHeader("X-Figma-Token", _figmaToken);
+            request.SetRequestHeader("X-Figma-Token", _figmaToken.Token);
             
             EditorUtility.DisplayProgressBar($"Downloading figma file {_figmaProjectId}", "Downloading...", 0);
             await request.SendWebRequest().ToUniTask(cancellationToken: _cancellationTokenSource.Token);
@@ -168,7 +176,7 @@ namespace Modules.FigmaImporter.Editor
             
             var commaSeparatedVisibleNodeIds = string.Join(',', nodes.Where(node => node.Visible).Select(x => x.Id));
             var request = UnityWebRequest.Get($"https://api.figma.com/v1/images/{_figmaProjectId}?ids={commaSeparatedVisibleNodeIds}&format=png");
-            request.SetRequestHeader("X-Figma-Token", _figmaToken);
+            request.SetRequestHeader("X-Figma-Token", _figmaToken.Token);
             
             EditorUtility.DisplayProgressBar($"Downloading images urls", "Downloading...", 0);
             await request.SendWebRequest().ToUniTask(cancellationToken: _cancellationTokenSource.Token);
