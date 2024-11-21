@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
-using Modules.ServiceLocator;
 using Cysharp.Threading.Tasks;
+using Modules.DiContainer;
 using Modules.Events;
 using Modules.Initializator;
 using Modules.PlatformService;

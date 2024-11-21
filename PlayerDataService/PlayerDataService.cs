@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.DiContainer;
 using Modules.Initializator;
 using Modules.PlatformService;
-using Modules.ServiceLocator;
 using Newtonsoft.Json;
 using UnityEngine;
 

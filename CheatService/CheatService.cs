@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.DiContainer;
 using Modules.Initializator;
 using Modules.LocalizationService;
-using Modules.ServiceLocator;
 using Modules.UIService;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,14 +36,14 @@ namespace Modules.CheatService
         void ICheatService.Show()
         {
             _isShown = true;
-            var canvas = ServiceLocator.Container.Resolve<IUIService>().Canvas;
+            var canvas = Container.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = false;
         }
 
         void ICheatService.Hide()
         {
             _isShown = false;
-            var canvas = ServiceLocator.Container.Resolve<IUIService>().Canvas;
+            var canvas = Container.Resolve<IUIService>().Canvas;
             canvas.GetComponent<GraphicRaycaster>().enabled = true;
         }
 

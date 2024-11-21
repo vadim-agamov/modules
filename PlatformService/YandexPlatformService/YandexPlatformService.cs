@@ -6,7 +6,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using Modules.Initializator;
-using Modules.ServiceLocator;
 using UnityEngine;
 
 namespace Modules.PlatformService.YandexPlatformService

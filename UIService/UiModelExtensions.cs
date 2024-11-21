@@ -1,5 +1,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.DiContainer;
 using Modules.Events;
 using Modules.UIService.Events;
 
@@ -9,7 +10,7 @@ namespace Modules.UIService
     {
         public static UniTask Open(this UIModel model, string key, CancellationToken token)
         {
-            var uiService = ServiceLocator.Container.Resolve<IUIService>();
+            var uiService = Container.Resolve<IUIService>();
             return uiService.Open(model, key, token);
         }
 
@@ -33,7 +34,7 @@ namespace Modules.UIService
 
         public static void Close(this UIModel model)
         {
-            var uiService = ServiceLocator.Container.Resolve<IUIService>();
+            var uiService = Container.Resolve<IUIService>();
             uiService.Close(model);
         }
 

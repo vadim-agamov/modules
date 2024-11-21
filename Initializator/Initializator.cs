@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Modules.ServiceLocator;
+using Modules.DiContainer;
 using UnityEngine;
 
 namespace Modules.Initializator
@@ -32,7 +32,7 @@ namespace Modules.Initializator
         {
             var dependencies = DependencyUtils.HasDependencies(service)
                 ? DependencyUtils.GetDependencies(service)
-                    .Select(ServiceLocator.Container.Resolve)
+                    .Select(Container.Resolve)
                     .OfType<IInitializable>()
                     .ToArray()
                 : Array.Empty<IInitializable>();

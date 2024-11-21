@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Modules.DiContainer;
 using Modules.PlatformService;
 
 namespace Modules.AnalyticsService
@@ -11,7 +12,7 @@ namespace Modules.AnalyticsService
         
         UniTask IAnalytic.Initialize(CancellationToken token)
         {
-            PlatformService = ServiceLocator.Container.Resolve<IPlatformService>();
+            PlatformService = Container.Resolve<IPlatformService>();
             return UniTask.CompletedTask;
         }
 

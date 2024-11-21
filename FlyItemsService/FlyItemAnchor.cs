@@ -1,3 +1,4 @@
+using Modules.DiContainer;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,12 +18,12 @@ namespace Modules.FlyItemsService
         
         private void OnEnable()
         {
-            ServiceLocator.Container.Resolve<IFlyItemsService>().RegisterAnchor(this);
+            Container.Resolve<IFlyItemsService>().RegisterAnchor(this);
         }
         
         private void OnDisable()
         {
-            ServiceLocator.Container.Resolve<IFlyItemsService>().UnregisterAnchor(this);
+            Container.Resolve<IFlyItemsService>().UnregisterAnchor(this);
         }
     }
 }
