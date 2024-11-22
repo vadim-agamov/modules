@@ -2,6 +2,7 @@
 
 1. [DI Container](#di-container)
 2. [Initializator](#initializator)
+3. [Event Bus](#event-bus)
 
 
 # [DI Container](./DiContainer)
@@ -90,5 +91,25 @@ This class perform instances initialization in proper order.
 
   // Initialize then in proper order
   await new Initializator(initializableServices).Do();
+```
+---
+
+# Event Bus
+
+[Events](./Events/Event.cs)
+
+An event bus allows publishing and receiving events across subsystems
+
+#### Example Usage:
+
+```csharp
+  // publish
+  Event<LocalizationChangedEvent>.Publish();
+
+  // subscribe 
+  Event<LocalizationChangedEvent>.Subscribe(OnLocalizationChanged);
+
+  // event waiter
+  await Event<LocalizationChangedEvent>.Wait();
 ```
 ---
