@@ -30,24 +30,12 @@ namespace Modules.LocalizationService
             Event<LocalizationChangedEvent>.Unsubscribe(OnLocalizationChanged);
         }
 
-        private void OnLocalizationChanged(LocalizationChangedEvent _)
-        {
-            Localize();
-        }
+        private void OnLocalizationChanged(LocalizationChangedEvent _) => Localize();
 
-        private void Localize()
-        {
-            _text.text = LocalizationService.Localize(_key, _args);
-        }
-        
-        public void SetParameters(params object[] args)
-        {
-            _args = args;
-        }
-        
-        private void OnValidate()
-        {
-            _text ??= GetComponent<TMP_Text>();
-        }
+        private void Localize() => _text.text = LocalizationService.Localize(_key, _args);
+
+        public void SetParameters(params object[] args) => _args = args;
+
+        private void OnValidate() => _text = GetComponent<TMP_Text>();
     }
 }

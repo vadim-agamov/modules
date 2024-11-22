@@ -22,6 +22,7 @@ namespace Modules.LocalizationService
         public string Value => _value;
     }
     
+    [CreateAssetMenu(menuName = "Create LocalizationConfig", fileName = "LocalizationConfig", order = 0)]
     public class LocalizationConfig : ScriptableObject
     {
         [SerializeField]
