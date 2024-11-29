@@ -18,6 +18,8 @@ namespace Modules.PlayerDataService
         private bool _savingIsInProgress;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private bool _isInitialized;
+        private const int AutoSaveInterval = 5;
+        private float _timeSinceLastSave;
         public bool IsInitialized => _isInitialized;
         
         [Inject]
@@ -48,21 +50,17 @@ namespace Modules.PlayerDataService
                 {
                     Debug.LogError($"[{nameof(PlayerDataService)}] Unable to deserialize player data:\r\n{e}");
                 }
-
-                Data ??= new TData();
+                finally
+                {
+                    Data ??= new TData();
+                }
             }
             _isInitialized = true;
         }
 
-        public void Dispose()
-        {
-            _cancellationTokenSource.Cancel();
-        }
-        
-        protected void SetDirty()
-        {
-            _needSave = true;
-        }
+        public void Dispose() => _cancellationTokenSource.Cancel();
+
+        protected void SetDirty() => _needSave = true;
 
         public void ResetData()
         {
@@ -72,9 +70,17 @@ namespace Modules.PlayerDataService
 
         public void Commit() => SetDirty();
 
+        public void ForceCommit()
+        {
+            SetDirty();
+            _timeSinceLastSave = AutoSaveInterval;
+        }
+
         private void Update()
         {
-            if (_needSave && !_savingIsInProgress)
+            _timeSinceLastSave += Time.deltaTime;
+            
+            if (_needSave && !_savingIsInProgress && _timeSinceLastSave >= AutoSaveInterval)
             {
                 CommitAsync().Forget();
             }
@@ -83,17 +89,22 @@ namespace Modules.PlayerDataService
             {
                 try
                 {
+                    Debug.Log($"[{nameof(PlayerDataService)}] saving...");
                     _savingIsInProgress = true;
-                    var data = JsonConvert.SerializeObject(Data);
+                    var data = JsonConvert.SerializeObject(Data, Formatting.Indented);
                     await PlatformService.SavePlayerProgress(data, _cancellationTokenSource.Token);
+                    Debug.Log($"[{nameof(PlayerDataService)}] saved");
                 }
                 catch(Exception exception)
                 {
                     Debug.LogError($"[{nameof(PlayerDataService)}] error while saving: {exception}");
                 }
-
-                _needSave = false;
-                _savingIsInProgress = false;
+                finally
+                {
+                    _needSave = false;
+                    _savingIsInProgress = false;
+                    _timeSinceLastSave = 0;
+                }
             }
         }
     }

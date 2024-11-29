@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Modules.Extensions
 {
@@ -14,6 +15,23 @@ namespace Modules.Extensions
         {
             var index = UnityEngine.Random.Range(0, list.Count);
             return list[index];
+        }
+        
+        public static T Random<T>(this T[] list, float[] weights)
+        {
+            var sum = weights.Sum();
+            var randomValue = UnityEngine.Random.Range(0f, sum);
+            var currentSum = 0f;
+            for (var i = 0; i < weights.Length; i++)
+            {
+                currentSum += weights[i];
+                if (randomValue <= currentSum)
+                {
+                    return list[i];
+                }
+            }
+
+            return list[^1];
         }
         
         public static IList<T> Shuffle<T>(this IList<T> self)
