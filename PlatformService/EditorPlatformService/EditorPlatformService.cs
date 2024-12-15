@@ -18,7 +18,7 @@ namespace Modules.PlatformService.EditorPlatformService
 		}
 
 		public bool IsInitialized => _isInitialized;
-		Language IPlatformService.GetLocale() => Language.English;
+		Language IPlatformService.GetLocale() => Language.Russian;
 
 		string IPlatformService.GetUserId() => SystemInfo.deviceUniqueIdentifier;
 

@@ -2,9 +2,9 @@ using Cysharp.Threading.Tasks;
 
 namespace Modules.Actions
 {
-    public abstract class LogicActionBase
+    public abstract class LogicActionBase<TInput, TOutput>
     {
-        public abstract bool Do(); // return true if board was updated
+        public abstract Result<TOutput> Do(Result<TInput> input);
     }
 
     public abstract class VisualActionBase
@@ -12,23 +12,28 @@ namespace Modules.Actions
         public abstract UniTask Do();
     }
 
-    public abstract class ActionBase : IAction
+    public abstract class ActionBase<TInput, TOutput> : IAction<TInput, TOutput>
     {
-        protected LogicActionBase LogicAction;
+        protected LogicActionBase<TInput,TOutput> LogicAction;
         protected VisualActionBase VisualAction;
-
-        public virtual async UniTask<bool> Do()
+        
+        public virtual async UniTask<Result<TOutput>> Do(Result<TInput> input)
         {
-            var success = LogicAction.Do();
-            if (success)
+            if(!input.Success)
+            {
+                return Result<TOutput>.Failed();
+            }
+            
+            var result = LogicAction.Do(input);
+            if (result.Success)
             {
                 if (VisualAction != null)
-                {
+                { 
                     await VisualAction.Do();
                 }
             }
-
-            return success;
+            
+            return result;
         }
     }
 }

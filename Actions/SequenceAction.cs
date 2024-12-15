@@ -1,34 +1,37 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using Cysharp.Threading.Tasks;
 
 namespace Modules.Actions
 {
-    public class SequenceAction : IAction
+    public class SequenceActionInternal<TInput, TOutput> : IAction<TInput, TOutput>
     {
-        private readonly List<IAction> _actions = new ();
-        private readonly ActionResultHandleType _resultHandleType;
+        private readonly Func<Result<TInput>, UniTask<Result<TOutput>>> _action;
 
-        public SequenceAction(ActionResultHandleType resultHandleType = ActionResultHandleType.WhenAny)
+        public SequenceActionInternal(Func<Result<TInput>, UniTask<Result<TOutput>>> action) => 
+            _action = action;
+        
+        public SequenceActionInternal<TInput, TNextOutput> Append<TNextOutput>(IAction<TOutput, TNextOutput> nextAction)
         {
-            _resultHandleType = resultHandleType;
-        }
+            return new SequenceActionInternal<TInput, TNextOutput>(CombineDo);
 
-        public SequenceAction Add(IAction action)
-        {
-            _actions.Add(action);
-            return this;
-        }
-
-        public async UniTask<bool> Do()
-        {
-            var results = new List<bool>();
-            foreach (var action in _actions)
+            // capture _action and nextAction
+            async UniTask<Result<TNextOutput>> CombineDo(Result<TInput> input)
             {
-                results.Add(await action.Do());
+                var intermediateOutput = await _action(input);
+                if(!intermediateOutput.Success)
+                {
+                    return Result<TNextOutput>.Failed();
+                }
+                return await nextAction.Do(intermediateOutput);
             }
-
-            return _resultHandleType == ActionResultHandleType.WhenAll ? results.All(result => result) : results.Any(result => result);
         }
+
+        public UniTask<Result<TOutput>> Do(Result<TInput> input) => _action(input);
+    }
+
+    public static class SequenceAction
+    {
+        public static SequenceActionInternal<TInput, TOutput> Start<TInput, TOutput>(IAction<TInput, TOutput> action) => 
+            new(action.Do);
     }
 }

@@ -1,35 +1,28 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 
 namespace Modules.Actions
 {
-    public class ParallelAction : IAction
+    public class ParallelAction<TInput> : IAction<TInput, Void>
     {
-        private readonly List<IAction> _actions = new ();
-        private readonly ActionResultHandleType _resultHandleType;
+        private readonly List<IAction<TInput, Void>> _actions = new List<IAction<TInput, Void>>();
 
-        public ParallelAction(ActionResultHandleType resultHandleType = ActionResultHandleType.WhenAny)
+        public ParallelAction<TInput> Add<TOutput>(IAction<TInput, TOutput> action)
         {
-            _resultHandleType = resultHandleType;
-        }
-
-        public ParallelAction Add(IAction action)
-        {
-            _actions.Add(action);
+            _actions.Add(new SuppressResultAction<TInput, TOutput>(action));
             return this;
         }
-
-        public async UniTask<bool> Do()
+        
+        public ParallelAction<TInput> Add<TOutput>(IAction<Void, TOutput> action)
         {
-            var tasks = new List<UniTask<bool>>();
-            foreach (var action in _actions.ToList())
-            {
-                tasks.Add(action.Do());
-            }
-
-            var results = await UniTask.WhenAll(tasks);
-            return _resultHandleType == ActionResultHandleType.WhenAll ? results.All(result => result) : results.Any(result => result);
+            _actions.Add(new SuppressInputAction<TInput, TOutput>(action));
+            return this;
+        }
+        
+        public async UniTask<Result<Void>> Do(Result<TInput> input = default)
+        {
+            await _actions.Select(action => action.Do(input));
+            return Result<Void>.Succeed(default);
         }
     }
 }
